@@ -1,0 +1,9 @@
+# Points By discussion with supervisor on 24-Mar-2025
+- clean dataset
+- train multiple models to see which one is best
+- show epoch level of training
+- make a graph of confusion matrix in 4 blocks (in color)
+- make a graph of correlation matrix in 4 blocks (in color)
+- make use case diagram, system diagram, sequence diagram etc
+- in report: write more references like 20 etc
+- in report: increase literature review
