@@ -60,9 +60,21 @@ const sampleData = {
 
 async function predictRansomware() {
   try {
-    const response = await axios.post('http://127.0.0.1:5000/predict', sampleData);
-    console.log('Prediction:', response.data.prediction);
-    console.log('Response:', response.data);
+    const response = await fetch('http://127.0.0.1:5000/predict', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sampleData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Prediction:', data.prediction);
+    console.log('Response:', data);
   } catch (error) {
     console.error('Error:', error.response ? error.response.data : error.message);
   }
