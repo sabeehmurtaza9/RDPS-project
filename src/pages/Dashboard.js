@@ -1,7 +1,7 @@
 import React from "react";
 import { Grid } from "@mui/material";
 import VirusTable from "../components/VirusTable";
-import Settings from "../components/Settings";
+import ProtectionCard from "../components/ProtectionCard";
 
 const Dashboard = () => {
     return (
@@ -10,7 +10,7 @@ const Dashboard = () => {
                 <VirusTable />
             </Grid>
             <Grid size={4}>
-                <Settings />
+                <ProtectionCard />
             </Grid>
         </Grid>
     );
