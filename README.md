@@ -10,3 +10,6 @@
 >
 > **Supervisor:** Sydney Ezika
 
+For ransomeware files testing
+
+@see https://github.com/kh4sh3i/Ransomware-Samples
