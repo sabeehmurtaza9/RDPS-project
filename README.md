@@ -13,3 +13,11 @@
 For ransomeware files testing
 
 @see https://github.com/kh4sh3i/Ransomware-Samples
+
+## Commands
+
+- **Start Development Server:** 
+    > npm run dev
+
+- **Start Production Server:** 
+    > npm run prod
