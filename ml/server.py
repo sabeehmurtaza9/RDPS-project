@@ -16,9 +16,7 @@ def predict():
     try:
         data = request.get_json()
         ret = predict_fn(data)
-        if not ret.get('success'):
-            return jsonify({'error': ret.get('error', 'Prediction failed')})
-        return jsonify({'prediction': ret.get('prediction', 'Legitimate')})
+        return jsonify(ret)
     except Exception as e:
         return jsonify({'error': str(e)})
 

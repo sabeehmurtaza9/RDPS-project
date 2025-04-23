@@ -51,3 +51,5 @@
     - Rows: 138,047 -> 104,422
     - File Size: 50.7mb -> 30.2mb
     - Row removal reasons: Duplicate rows
+    - Legitimate Rows: 63,104
+    - Ransomware Rows: 41,318
