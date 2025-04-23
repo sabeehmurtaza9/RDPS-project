@@ -4,8 +4,8 @@ from sklearn.impute import SimpleImputer
 import pandas as pd
 
 # Load the trained model and scaler
-model_path = os.path.join(os.path.dirname(__file__), "../output/logistic_regression_model.joblib")
-scaler_path = os.path.join(os.path.dirname(__file__), "../output/logistic_regression_scaler.joblib")
+model_path = os.path.join(os.path.dirname(__file__), "../models/logistic_regression_model.joblib")
+scaler_path = os.path.join(os.path.dirname(__file__), "../models/logistic_regression_scaler.joblib")
 model = joblib.load(model_path)
 scaler = joblib.load(scaler_path)
 

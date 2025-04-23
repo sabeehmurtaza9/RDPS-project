@@ -6,8 +6,25 @@ dataset_path = os.path.join(os.path.dirname(__file__), "../datasets/ransomware.c
 df = pd.read_csv(dataset_path)
 
 # Step 1: Drop specified columns
-columns_to_drop = ['MajorLinkerVersion', 'MinorLinkerVersion']
+columns_to_drop = [
+    'ImportsNbDLL',
+    'ImportsNb',
+    'ImportsNbOrdinal',
+    'ExportNb',
+    'ResourcesNb',
+    'ResourcesMeanEntropy',
+    'ResourcesMinEntropy',
+    'ResourcesMaxEntropy',
+    'ResourcesMeanSize',
+    'ResourcesMinSize',
+    'ResourcesMaxSize',
+    'LoadConfigurationSize',
+    'VersionInformationSize'
+]
 df = df.drop(columns=columns_to_drop, errors='ignore')
+
+# Clean column names (remove leading/trailing spaces)
+df.columns = df.columns.str.strip()
 
 # Step 2: Clean dataset (handle missing values)
 df = df.dropna()  # Remove rows with missing values

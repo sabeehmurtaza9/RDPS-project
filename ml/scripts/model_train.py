@@ -7,14 +7,8 @@ import joblib
 import os
 
 # Resolve the dataset path relative to the current directory
-dataset_path = os.path.join(os.path.dirname(__file__), "../datasets/ransomware.csv")
+dataset_path = os.path.join(os.path.dirname(__file__), "../datasets/cleaned.csv")
 data = pd.read_csv(dataset_path)
-
-# Clean column names (remove leading/trailing spaces)
-data.columns = data.columns.str.strip()
-
-# Handle missing values (if any)
-data.fillna(0, inplace=True)
 
 # Feature selection
 X = data.drop(['Name', 'md5', 'legitimate'], axis=1)  # Features
@@ -51,9 +45,9 @@ print("\nConfusion Matrix:")
 print(conf_matrix)
 
 # Save the trained model and scaler
-output_model_dir = os.path.join(os.path.dirname(__file__), "../output/logistic_regression_model.joblib")
-output_scaler_dir = os.path.join(os.path.dirname(__file__), "../output/logistic_regression_scaler.joblib")
+output_model_dir = os.path.join(os.path.dirname(__file__), "../models/logistic_regression_model.joblib")
+models_scaler_dir = os.path.join(os.path.dirname(__file__), "../models/logistic_regression_scaler.joblib")
 joblib.dump(model, output_model_dir)
-joblib.dump(scaler, output_scaler_dir)
+joblib.dump(scaler, models_scaler_dir)
 
 print("\nModel and scaler saved successfully!")
