@@ -109,6 +109,7 @@ async function analyzePE(filePath) {
 
         // Debugging: Log the parsed PE object to check its structure
         // console.log("Parsed PE object:", pe);
+        // console.log("Parsed PE object DataDirectory:", pe.nt_headers.OptionalHeader.DataDirectory);
 
         // Ensure that necessary headers exist
         if (!pe.nt_headers.FileHeader || !pe.nt_headers.OptionalHeader) {
@@ -171,5 +172,38 @@ async function analyzePE(filePath) {
 }
 
 // Example usage:
-// analyzePE(path.resolve(__dirname, "../watched/cerber.exe"));
-analyzePE(path.resolve(__dirname, "../watched/Locky.exe"));
+analyzePE(path.resolve(__dirname, "../watched/cerber.exe"));
+// analyzePE(path.resolve(__dirname, "../watched/Locky.exe"));
+// analyzePE(path.resolve(__dirname, "../watched/FileZilla.exe"));
+(async () => {
+    const files = [
+        path.resolve(__dirname, "../watched/cerber.exe"),
+        path.resolve(__dirname, "../watched/Locky.exe"),
+        path.resolve(__dirname, "../watched/FileZilla.exe"),
+    ];
+    for (const x of files) {
+        try {
+            const info = await analyzePE(x);
+            const response = await fetch('http://127.0.0.1:6001/predict', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(info),
+            });
+        
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        
+            const data = await response.json();
+            console.log({
+                file: x,
+                data: data.data,
+            });
+            // console.log('Response:', data);
+          } catch (error) {
+            console.error('Error:', error.response ? error.response.data : error.message);
+          }
+    }
+})();

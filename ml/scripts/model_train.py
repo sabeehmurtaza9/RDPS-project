@@ -8,28 +8,87 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import joblib
 import os
 import time
+from imblearn.over_sampling import SMOTE
+from sklearn.metrics import classification_report
+from sklearn.utils import resample
+
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
+
+columns = [
+    # "CheckSum",
+    "SectionsMeanEntropy",
+    "SectionsMinEntropy",
+    "SectionsMaxEntropy",
+    # "ImportsNbDLL",
+    # "ImportsNb",
+    # "ImportsNbOrdinal",
+    # "ExportNb",
+    # "ResourcesNb",
+    "ResourcesMeanEntropy",
+    "ResourcesMinEntropy",
+    "ResourcesMaxEntropy",
+    # "ResourcesMeanSize",
+    # "ResourcesMinSize",
+    # "ResourcesMaxSize",
+    # "LoadConfigurationSize",
+    # "VersionInformationSize",
+    "legitimate",
+]
 
 # Resolve the dataset path relative to the current directory
 # dataset_path = os.path.join(os.path.dirname(__file__), "../datasets/cleaned.csv")
 dataset_path = os.path.join(os.path.dirname(__file__), "../datasets/ransomware.csv")
-data = pd.read_csv(dataset_path)
+data = pd.read_csv(dataset_path, usecols=columns)
+
+# Downsampling to balance the dataset
+from sklearn.utils import resample
+
+# Separate majority and minority classes
+df_majority = data[data.legitimate == 0]
+df_minority = data[data.legitimate == 1]
+
+# Downsample majority class to match minority
+df_majority_downsampled = resample(
+    df_majority,
+    replace=False,                         # sample without replacement
+    n_samples=len(df_minority),           # to match minority class
+    random_state=42
+)
+
+# Combine minority class with downsampled majority class
+data_balanced = pd.concat([df_majority_downsampled, df_minority])
+
+# Shuffle the balanced dataset
+data_balanced = data_balanced.sample(frac=1, random_state=42)
 
 # Feature selection
-X = data.drop(['Name', 'md5', 'legitimate'], axis=1)  # Features
-y = data['legitimate']  # Target label
+# X = data_balanced.drop(['Name', 'md5', 'legitimate'], axis=1)
+X = data_balanced.drop(['legitimate'], axis=1)
+y = data_balanced['legitimate']
+
+
+print(data['legitimate'].value_counts())
+print(data_balanced['legitimate'].value_counts())
 
 # Split data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Apply SMOTE after splitting
+smote = SMOTE(random_state=42)
+X_train, y_train = smote.fit_resample(X_train, y_train)
 
 # Scale the features
 scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+X_train_scaled = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.columns)
+X_test_scaled = pd.DataFrame(scaler.transform(X_test), columns=X_test.columns)
 
 models = {
+    # "Logistic Regression": LogisticRegression(class_weight='balanced'),
+    # "Random Forest": RandomForestClassifier(class_weight='balanced'),
     "Logistic Regression": LogisticRegression(),
     "Random Forest": RandomForestClassifier(),
-    "SVM": SVC(probability=True)
+    # "SVM": SVC(probability=True)
 }
 
 results = []
@@ -51,6 +110,7 @@ for name, model in models.items():
     roc_auc = roc_auc_score(y_test, y_proba) if y_proba is not None else "N/A"
     cv_score = cross_val_score(model, X_train_scaled, y_train, cv=5).mean()
     conf_matrix = confusion_matrix(y_test, y_pred)
+    print(f"\nClassification Report for {name}:\n", classification_report(y_test, y_pred))
     
     results.append({
         "Model": name,
@@ -66,6 +126,15 @@ for name, model in models.items():
 
     output_model_dir = os.path.join(os.path.dirname(__file__), "../models/" + name.replace(" ", "") + "Model.joblib")
     joblib.dump(model, output_model_dir)
+    
+    ransom_sample = X_train[y_train == 1].iloc[0:1]
+    ransom_sample_scaled = pd.DataFrame(scaler.transform(ransom_sample), columns=X_train.columns)
+
+    ransom_pred = model.predict_proba(ransom_sample_scaled)
+    predicted_class = model.predict(ransom_sample_scaled)
+    print(f"\nPredicted probabilities for ransomware sample:\n{ransom_pred}")
+    print(f"Predicted class: {'Legitimate' if predicted_class[0] == 0 else 'Ransomware'}")
+
 
 # 7. Show Results
 results_df = pd.DataFrame(results)
