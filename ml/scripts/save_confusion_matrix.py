@@ -3,7 +3,7 @@ import seaborn as sns
 import os
 
 # Confusion matrix values
-conf_matrix = [[18716, 177], [94, 12340]]
+conf_matrix = [[8095, 176], [52, 8207]]
 
 # Plotting
 plt.figure(figsize=(6, 5))

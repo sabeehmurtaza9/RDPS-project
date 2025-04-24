@@ -3,9 +3,20 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 
+
+columns = [
+    "SectionsMeanEntropy",
+    "SectionsMinEntropy",
+    "SectionsMaxEntropy",
+    "ResourcesMeanEntropy",
+    "ResourcesMinEntropy",
+    "ResourcesMaxEntropy",
+    "legitimate",
+]
+
 # Load your dataset
-dataset_path = os.path.join(os.path.dirname(__file__), "../datasets/cleaned.csv")
-df = pd.read_csv(dataset_path)
+dataset_path = os.path.join(os.path.dirname(__file__), "../datasets/ransomware.csv")
+df = pd.read_csv(dataset_path, usecols=columns)
 
 # Optional: drop non-numeric columns if needed
 # df = df.select_dtypes(include=['number'])
