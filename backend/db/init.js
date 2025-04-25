@@ -1,6 +1,27 @@
 const options = {};
 const db = require('better-sqlite3')('system.db', options);
 
+const initialiseSettings = () => {
+    const settingsStructure = {
+        dark_mode: { key: 'dark_mode', value: 'true' },
+        enable_protection: { key: 'enable_protection', value: 'true' },
+        watched_dir_path: { key: 'watched_dir_path', value: '' },
+    };
+
+    // Fetch all existing settings keys in one query
+    const existingSettings = db.prepare('SELECT var_key FROM settings').all();
+    const existingKeys = new Set(existingSettings.map(setting => setting.var_key));
+
+    // Insert only the missing settings
+    for (const key in settingsStructure) {
+        if (!existingKeys.has(key)) {
+            const setting = settingsStructure[key];
+            db.prepare('INSERT INTO settings (var_key, var_value) VALUES (?, ?)')
+              .run(setting.key, setting.value);
+        }
+    }
+}
+
 module.exports = {
     db: db,
     initialiseDB: () => {
@@ -23,21 +44,6 @@ module.exports = {
                 deleted_at TIMESTAMP
             );
         `);
-        const settingsStructure = {
-            dark_mode: { key: 'dark_mode', value: 'true' },
-        };
-
-        // Fetch all existing settings keys in one query
-        const existingSettings = db.prepare('SELECT var_key FROM settings').all();
-        const existingKeys = new Set(existingSettings.map(setting => setting.var_key));
-
-        // Insert only the missing settings
-        for (const key in settingsStructure) {
-            if (!existingKeys.has(key)) {
-                const setting = settingsStructure[key];
-                db.prepare('INSERT INTO settings (var_key, var_value) VALUES (?, ?)')
-                  .run(setting.key, setting.value);
-            }
-        }
+        initialiseSettings();
     }
 };

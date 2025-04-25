@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import { SettingsContext } from "../context/SettingsContext";
 import { Card, CardContent, Typography, Switch, FormControlLabel } from "@mui/material";
 
 const ProtectionCard = () => {
-    const { darkMode, toggleDarkMode } = useContext(ThemeContext);
+    const { settings, enableProtection, disableProtection } = useContext(SettingsContext);
 
     return (
         <Card sx={{ width: '100%' }}>
@@ -14,13 +14,13 @@ const ProtectionCard = () => {
                 <FormControlLabel
                     control={
                         <Switch
-                            checked={darkMode}
-                            onChange={toggleDarkMode}
+                            checked={settings?.enable_protection === "true"}
+                            onChange={settings?.enable_protection === "true" ? disableProtection : enableProtection}
                             color="primary"
                             size="medium"
                         />
                     }
-                    label={`Ransomware Protection is ${darkMode ? "On" : "Off"}`}
+                    label={`Ransomware Protection is ${settings?.enable_protection === "true" ? "On" : "Off"}`}
                 />
             </CardContent>
         </Card>

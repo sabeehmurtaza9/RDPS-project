@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from flask import Flask, request, jsonify
 import os
 from dotenv import load_dotenv
