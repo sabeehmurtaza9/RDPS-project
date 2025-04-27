@@ -53,18 +53,21 @@ def predict_from_model (data):
         if missing:
             raise ValueError(f"Missing required columns: {', '.join(missing)}")
         
+        # logging.debug(data)
+
         # df = pd.DataFrame([{col: data[col] for col in required_columns}])
         df = pd.DataFrame([data], columns=required_columns)
 
-        data_scaled = scaler.transform(df)
+        # data_scaled = scaler.transform(df)
+        data_scaled = pd.DataFrame(scaler.transform(df), columns=df.columns)
         prediction = model.predict(data_scaled)[0]
         proba = model.predict_proba(data_scaled)[0]
 
         # print(f"Legitimate: {proba[0]:.2f}, Malicious: {proba[1]:.2f}")
-        logging.debug(df.columns.tolist())
-        logging.debug("DataFrame passed to model:\n", df)
-        logging.debug("Scaled data:", data_scaled)
-        logging.debug("Probabilities:", proba)
+        # logging.debug(df.columns.tolist())
+        # logging.debug("DataFrame passed to model:\n", df)
+        # logging.debug("Scaled data:", data_scaled)
+        # logging.debug("Probabilities:", proba)
         ret['success'] = True
         ret['data'] = {
             "malicious": True if prediction == 1 else False,

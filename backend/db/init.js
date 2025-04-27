@@ -1,7 +1,7 @@
 const options = {};
 const db = require('better-sqlite3')('system.db', options);
 
-const initialiseSettings = () => {
+const initializeSettings = () => {
     const settingsStructure = {
         dark_mode: { key: 'dark_mode', value: 'true' },
         enable_protection: { key: 'enable_protection', value: 'true' },
@@ -24,7 +24,7 @@ const initialiseSettings = () => {
 
 module.exports = {
     db: db,
-    initialiseDB: () => {
+    initializeDB: () => {
         db.exec(`
             CREATE TABLE IF NOT EXISTS settings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,6 +44,6 @@ module.exports = {
                 deleted_at TIMESTAMP
             );
         `);
-        initialiseSettings();
+        initializeSettings();
     }
 };

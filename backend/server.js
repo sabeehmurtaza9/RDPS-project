@@ -1,5 +1,5 @@
 const express = require("express");
-const { initialiseDB } = require("./db/init");
+const { initializeDB } = require("./db/init");
 const { initialiseRouter } = require("./routers/init");
 const app = express();
 const cors = require("cors");
@@ -10,7 +10,7 @@ const PORT = process.env.EXPRESS_PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
-initialiseDB();
+initializeDB();
 initialiseRouter(app);
 
 app.get("/", (req, res) => {

@@ -77,19 +77,19 @@ def extract_pe_metadata(filepath):
         res = {
             'success': True,
             'data': {
-                'ImportsNbDLL': int(imports_nb_dll),
-                'ImportsNb': int(imports_nb),
-                'ImportsNbOrdinal': int(imports_nb_ordinal),
-                'ExportNb': int(export_nb),
-                'ResourcesNb': int(resources_nb),
+                # 'ImportsNbDLL': int(imports_nb_dll),
+                # 'ImportsNb': int(imports_nb),
+                # 'ImportsNbOrdinal': int(imports_nb_ordinal),
+                # 'ExportNb': int(export_nb),
+                # 'ResourcesNb': int(resources_nb),
                 'ResourcesMeanEntropy': float(resources_mean_entropy),
                 'ResourcesMinEntropy': float(resources_min_entropy),
                 'ResourcesMaxEntropy': float(resources_max_entropy),
-                'ResourcesMeanSize': float(resources_mean_size),
-                'ResourcesMinSize': int(resources_min_size),
-                'ResourcesMaxSize': int(resources_max_size),
-                'LoadConfigurationSize': int(load_config_size),
-                'VersionInformationSize': int(version_info_size)
+                # 'ResourcesMeanSize': float(resources_mean_size),
+                # 'ResourcesMinSize': int(resources_min_size),
+                # 'ResourcesMaxSize': int(resources_max_size),
+                # 'LoadConfigurationSize': int(load_config_size),
+                # 'VersionInformationSize': int(version_info_size)
             }
         }
 
