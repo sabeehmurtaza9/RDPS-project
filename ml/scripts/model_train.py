@@ -48,8 +48,8 @@ X_train_scaled = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.col
 X_test_scaled = pd.DataFrame(scaler.transform(X_test), columns=X_test.columns)
 
 models = {
-    # "Logistic Regression": LogisticRegression(),
-    # "Random Forest": RandomForestClassifier(),
+    "Logistic Regression": LogisticRegression(),
+    "Random Forest": RandomForestClassifier(),
     "SVM": SVC(probability=True)
 }
 
