@@ -4,7 +4,8 @@ const fs = require("fs");
 const notifier = require("node-notifier");
 require("dotenv").config();
 const { getSettings } = require("../controllers/SettingsController");
-const { analyseFile, predictFile, updateVirusFileInDB, quarantineFile } = require("../utils/detection");
+const { analyseFile, predictFile, updateVirusFileInDB, quarantineFile, isAllowedVirusFile, createFileMD5 } = require("../utils/detection");
+const dayjs = require("dayjs");
 
 const getWatchedDirPath = () => {
     const settings = getSettings();
@@ -55,6 +56,7 @@ const readAllFilesAndFolders = (dirPath, callbackFn) => {
 
 const analyzeFileAndTakeActionIfNeeded = async (filePath, fileName) => {
     const fileInfoRaw = await analyseFile(filePath);
+    const fileMD5 = await createFileMD5(filePath);
     const fileInfo = {
         SectionsMeanEntropy: fileInfoRaw.SectionsMeanEntropy,
         SectionsMinEntropy: fileInfoRaw.SectionsMinEntropy,
@@ -63,29 +65,22 @@ const analyzeFileAndTakeActionIfNeeded = async (filePath, fileName) => {
         ResourcesMinEntropy: fileInfoRaw.ResourcesMinEntropy,
         ResourcesMaxEntropy: fileInfoRaw.ResourcesMaxEntropy,
     };
-    const prediction = await predictFile(fileInfo);
-    if (prediction.malicious) {
-        notifier.notify({
-            title: process.env.REACT_APP_PROJECT_NAME ?? "RDPS",
-            message: `Ransomware detected! (${fileName})`,
-            sound: true,
-            timeout: 60,
-            wait: true,
-            open: process.env.REACT_APP_FE_URL,
-        });
-        const now = new Date();
-        const newFileName = [
-            now.getFullYear(),
-            String(now.getMonth() + 1).padStart(2, "0"),
-            String(now.getDate()).padStart(2, "0"),
-            String(now.getHours()).padStart(2, "0"),
-            String(now.getMinutes()).padStart(2, "0"),
-            String(now.getSeconds()).padStart(2, "0"),
-            '---',
-            path.basename(filePath),
-        ].join("");
-        quarantineFile(filePath, newFileName);
-        updateVirusFileInDB(filePath, fileInfo, newFileName);
+    if (!isAllowedVirusFile(filePath, fileMD5)) {
+        const prediction = await predictFile(fileInfo);
+        if (prediction.malicious) {
+            console.log("Malicious file detected:", fileName);
+            notifier.notify({
+                title: process.env.REACT_APP_PROJECT_NAME ?? "RDPS",
+                message: `Ransomware detected! (${fileName})`,
+                sound: true,
+                timeout: 60,
+                wait: true,
+                open: process.env.REACT_APP_FE_URL,
+            });
+            const newFileName = `${dayjs().format("YYYYMMDDHHmmss")}---${fileName}`;
+            quarantineFile(filePath, newFileName);
+            updateVirusFileInDB(filePath, fileInfo, newFileName, fileMD5);
+        }
     }
 };
 
@@ -122,6 +117,9 @@ const initializeFirstScan = (dirPath) => {
     try {
         const dirPath = getWatchedDirPath();
         initializeFirstScan(dirPath);
+        setInterval(() => {
+            initializeFirstScan(dirPath);
+        }, 1000 * 60 * 60);
         initializeWatcher(dirPath);
     } catch (error) {
         console.error("Error initializing watcher:", error);

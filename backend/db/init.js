@@ -7,12 +7,8 @@ const initializeSettings = () => {
         enable_protection: { key: 'enable_protection', value: 'true' },
         watched_dir_path: { key: 'watched_dir_path', value: '' },
     };
-
-    // Fetch all existing settings keys in one query
     const existingSettings = db.prepare('SELECT var_key FROM settings').all();
     const existingKeys = new Set(existingSettings.map(setting => setting.var_key));
-
-    // Insert only the missing settings
     for (const key in settingsStructure) {
         if (!existingKeys.has(key)) {
             const setting = settingsStructure[key];
@@ -38,6 +34,7 @@ module.exports = {
                 file_name TEXT NOT NULL,
                 file_path TEXT NOT NULL,
                 file_info TEXT NOT NULL,
+                file_md5 TEXT NOT NULL,
                 quarantine_at TIMESTAMP,
                 quarantine_path TEXT,
                 allowed_at TIMESTAMP,

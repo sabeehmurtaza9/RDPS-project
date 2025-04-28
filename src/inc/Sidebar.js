@@ -30,7 +30,7 @@ const Sidebar = () => {
                     width: isExpanded ? 200 : 60,
                     boxSizing: 'border-box',
                     transition: 'width 0.3s',
-                    backgroundColor: darkMode ? '#303030' : '#fff', // Ensure consistent background color
+                    backgroundColor: darkMode ? '#303030' : '#fff'
                 },
             }}
         >
@@ -39,7 +39,7 @@ const Sidebar = () => {
                 <ListItem
                     disablePadding
                     sx={{
-                        height: '64px', // Set height equal to header height
+                        height: '64px'
                     }}
                 >
                     <ListItemButton onClick={() => setIsExpanded(!isExpanded)}>

@@ -1,8 +1,9 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const PeParser = require("pe-parser");
 const { db } = require("../db/init");
-require('dotenv').config()
+require("dotenv").config();
 
 function calculateEntropy(buffer) {
     const frequency = new Array(256).fill(0);
@@ -102,17 +103,28 @@ module.exports = {
             throw new Error(`HTTP error! status: ${response.status} [b]`);
         }
     },
-    updateVirusFileInDB: (filePath, fileInfo, newFileName) => {
+    isAllowedVirusFile: (filePath, fileMD5) => {
+        try {
+            const qry = db.prepare("SELECT allowed_at FROM viruses WHERE file_path = ? and file_md5 = ?");
+            const fileRecord = qry.get(filePath, fileMD5);
+            if (fileRecord && fileRecord.allowed_at) return true;
+            return false;
+        } catch (error) {
+            console.error("Error checking allowed virus file in DB:", error);
+            return false;
+        }
+    },
+    updateVirusFileInDB: (filePath, fileInfo, newFileName, fileMD5) => {
         try {
             const quarantineAt = new Date().toISOString();
             const quarantinePath = path.resolve(__dirname, `../../quarantine/${newFileName}`);
             const fileInfoString = JSON.stringify(fileInfo);
             const fileName = path.basename(filePath);
             const qry = db.prepare(`
-                INSERT INTO viruses (file_name, file_path, file_info, quarantine_at, quarantine_path)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO viruses (file_name, file_path, file_info, file_md5, quarantine_at, quarantine_path)
+                VALUES (?, ?, ?, ?, ?, ?)
             `);
-            const result = qry.run(fileName, filePath, fileInfoString, quarantineAt, quarantinePath);
+            const result = qry.run(fileName, filePath, fileInfoString, fileMD5, quarantineAt, quarantinePath);
             return result;
         } catch (error) {
             console.error("Error updating virus file in DB:", error);
@@ -128,5 +140,13 @@ module.exports = {
             console.error("Error quarantining file:", error);
             throw new Error("File quarantine failed");
         }
+    },
+    createFileMD5: (filePath) => {
+        return new Promise((res, rej) => {
+            const hash = crypto.createHash("md5");
+            const rStream = fs.createReadStream(filePath);
+            rStream.on("data", (data) => hash.update(data));
+            rStream.on("end", () => res(hash.digest("hex")));
+        });
     },
 };

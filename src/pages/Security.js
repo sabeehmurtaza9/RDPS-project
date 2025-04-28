@@ -138,14 +138,16 @@ const Security = () => {
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <ButtonGroup>
-                                            <Button size="small" variant="contained" color="primary" onClick={() => handleAllowFile(row.id)}>
-                                                Allow?
-                                            </Button>
-                                            <Button size="small" variant="contained" color="error" onClick={() => handleRemoveFile(row.id)}>
-                                                Remove?
-                                            </Button>
-                                        </ButtonGroup>
+                                        {!row.allowed_at && !row.removed_at && (
+                                            <ButtonGroup>
+                                                <Button size="small" variant="contained" color="primary" onClick={() => handleAllowFile(row.id)}>
+                                                    Allow?
+                                                </Button>
+                                                <Button size="small" variant="contained" color="error" onClick={() => handleRemoveFile(row.id)}>
+                                                    Remove?
+                                                </Button>
+                                            </ButtonGroup>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))}
