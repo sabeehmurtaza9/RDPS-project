@@ -35,9 +35,12 @@ module.exports = {
             );
             CREATE TABLE IF NOT EXISTS viruses (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                file_name TEXT NOT NULL,
                 file_path TEXT NOT NULL,
+                file_info TEXT NOT NULL,
                 quarantine_at TIMESTAMP,
                 quarantine_path TEXT,
+                allowed_at TIMESTAMP,
                 removed_at TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP,

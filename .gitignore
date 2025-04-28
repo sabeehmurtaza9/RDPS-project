@@ -27,3 +27,4 @@ yarn-error.log*
 ml/venv
 watched/*
 system.db
+quarantine/*

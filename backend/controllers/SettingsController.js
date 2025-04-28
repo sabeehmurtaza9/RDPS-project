@@ -1,8 +1,7 @@
 const { default: collect } = require("collect.js");
 const { db } = require("../db/init");
-// const fileDialog = require('node-file-dialog');
 const osa = require("node-osascript");
-const { monitor } = require("../utils/process");
+const { monitor } = require("../scripts/process");
 
 const getSettings = () => {
     const qry = db.prepare("SELECT var_key, var_value FROM settings");

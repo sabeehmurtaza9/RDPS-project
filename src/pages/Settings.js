@@ -66,7 +66,7 @@ const Settings = () => {
                                 <TableCell sx={{ fontWeight: "bold" }}>Notifications Enabled?</TableCell>
                                 <TableCell>
                                     {Notification.permission === "default" ? (
-                                        <Button variant="contained" onClick={enableNotification}>
+                                        <Button size="small" variant="contained" onClick={enableNotification}>
                                             Enable Notification
                                         </Button>
                                     ) : Notification.permission === "granted" ? (
@@ -86,7 +86,7 @@ const Settings = () => {
                                 <TableCell>
                                     {["", null, undefined].includes(settings?.watched_dir_path) ? (
                                         <>
-                                            <Button variant="contained" onClick={selectWatchedFolderSetting}>
+                                            <Button size="small" variant="contained" onClick={selectWatchedFolderSetting}>
                                                 Select Watched Folder
                                             </Button>
                                         </>

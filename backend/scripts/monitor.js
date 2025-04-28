@@ -1,11 +1,10 @@
 const chokidar = require("chokidar");
 const path = require("path");
 const fs = require("fs");
-const notifier = require('node-notifier');
-require('dotenv').config()
+const notifier = require("node-notifier");
+require("dotenv").config();
 const { getSettings } = require("../controllers/SettingsController");
-const { analyseFile, predictFile } = require("../utils/detection");
-const { time } = require("console");
+const { analyseFile, predictFile, updateVirusFileInDB, quarantineFile } = require("../utils/detection");
 
 const getWatchedDirPath = () => {
     const settings = getSettings();
@@ -46,12 +45,9 @@ const readAllFilesAndFolders = (dirPath, callbackFn) => {
         entries.forEach((entry) => {
             const fullPath = path.join(dirPath, entry.name);
             if (entry.isDirectory()) {
-                // console.log(`Directory: ${fullPath}`);
-                // Recursively read nested directories
                 readAllFilesAndFolders(fullPath);
             } else {
                 callbackFn(fullPath, entry.name);
-                // console.log(`File: ${fullPath}`);
             }
         });
     });
@@ -74,10 +70,24 @@ const analyzeFileAndTakeActionIfNeeded = async (filePath, fileName) => {
             message: `Ransomware detected! (${fileName})`,
             sound: true,
             timeout: 60,
-            wait: true
+            wait: true,
+            open: process.env.REACT_APP_FE_URL,
         });
+        const now = new Date();
+        const newFileName = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, "0"),
+            String(now.getDate()).padStart(2, "0"),
+            String(now.getHours()).padStart(2, "0"),
+            String(now.getMinutes()).padStart(2, "0"),
+            String(now.getSeconds()).padStart(2, "0"),
+            '---',
+            path.basename(filePath),
+        ].join("");
+        quarantineFile(filePath, newFileName);
+        updateVirusFileInDB(filePath, fileInfo, newFileName);
     }
-}
+};
 
 const initializeWatcher = (dirPath) => {
     if (!dirPath) {
@@ -89,7 +99,6 @@ const initializeWatcher = (dirPath) => {
         ignoreInitial: true,
     });
     watcher.on("add", (filePath) => {
-        // console.log(`File added: ${filePath}`);
         if (isFileAllowedToBeAnalyzed(filePath)) {
             analyzeFileAndTakeActionIfNeeded(filePath, path.basename(filePath));
         }

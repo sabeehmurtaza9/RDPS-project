@@ -1,37 +1,24 @@
-const forever = require('forever-monitor');
-const path = require('path');
+const net = require("net");
 
-const scriptPath = path.join(__dirname, '../scripts/monitor.js');
-
-const monitor = new (forever.Monitor)(scriptPath, {
-  max: 3,
-  silent: false,
-  command: 'node',
-//   args: ['--watch=/user/folder']
-});
-
-monitor.on('start', () => console.log('📡 Scanner started.'));
-monitor.on('exit', () => console.log('❌ Scanner exited.'));
-monitor.on('restart', () => console.log('♻️ Scanner restarted.'));
-
-// Capture the child process output:
-// monitor.on('stdout', data => {
-//     console.log('📤 [scanner stdout]:', data.toString());
-//   });
-  
-//   monitor.on('stderr', data => {
-//     console.error('📛 [scanner stderr]:', data.toString());
-//   });
-  
-//   // OR, if those don't work, attach directly:
-//   monitor.child && monitor.child.stdout && monitor.child.stdout.on('data', data => {
-//     console.log('📤 [scanner stdout]:', data.toString());
-//   });
-  
-//   monitor.child && monitor.child.stderr && monitor.child.stderr.on('data', data => {
-//     console.error('📛 [scanner stderr]:', data.toString());
-//   });
+async function isPortInUse(port, host = "127.0.0.1") {
+    return new Promise((resolve, reject) => {
+        const server = net.createServer();
+        server.once("error", (err) => {
+            if (err.code === "EADDRINUSE") {
+                resolve(true);
+            } else {
+                reject(err);
+            }
+        });
+        server.once("listening", () => {
+            server.close(() => {
+                resolve(false);
+            });
+        });
+        server.listen(port, host);
+    });
+}
 
 module.exports = {
-    monitor
+    isPortInUse
 };
